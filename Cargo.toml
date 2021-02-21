@@ -1,0 +1,13 @@
+[package]
+name = "hashstorage-utils"
+version = "0.1.0"
+authors = ["Alexander <mail@fomalhaut.su>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+rand = "0.7.3"
+sha2 = "0.8.1"
+bigi = { git = "https://github.com/fomalhaut88/bigi.git", tag = "v0.4.0" }
+bigi-ecc = { git = "https://github.com/fomalhaut88/bigi-ecc.git", tag = "v0.4.1" }
