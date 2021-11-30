@@ -10,8 +10,8 @@ use bigi_ecc::ecdsa::{check_signature as ecdsa_check_signature,
 use crate::convert::*;
 
 
-pub fn build_signature<T: CurveTrait, R: Rng + ?Sized>(
-            rng: &mut R, schema: &Schema<T>,
+pub fn build_signature<T: CurveTrait<4>, R: Rng + ?Sized>(
+            rng: &mut R, schema: &Schema<T, 4>,
             private_key: &[u8; 32], group: &[u8; 32], key: &[u8; 32],
             version: u64, data: &[u8]
         ) -> [u8; 64] {
@@ -24,8 +24,8 @@ pub fn build_signature<T: CurveTrait, R: Rng + ?Sized>(
 }
 
 
-pub fn check_signature<T: CurveTrait>(
-            schema: &Schema<T>, signature: &[u8; 64],
+pub fn check_signature<T: CurveTrait<4>>(
+            schema: &Schema<T, 4>, signature: &[u8; 64],
             public_key: &[u8; 64], group: &[u8; 32], key: &[u8; 32],
             version: u64, data: &[u8]
         ) -> bool {
@@ -41,8 +41,8 @@ pub fn check_signature<T: CurveTrait>(
 pub fn sha256_hash(bytes: &[u8]) -> [u8; 32] {
     let mut hasher = Sha256::new();
     hasher.reset();
-    hasher.input(bytes);
-    hasher.result().try_into().unwrap()
+    hasher.update(bytes);
+    hasher.finalize().try_into().unwrap()
 }
 
 
@@ -55,8 +55,8 @@ pub fn sha256_pack(
 }
 
 
-pub fn generate_pair<T: CurveTrait, R: Rng + ?Sized>(
-            rng: &mut R, schema: &Schema<T>
+pub fn generate_pair<T: CurveTrait<4>, R: Rng + ?Sized>(
+            rng: &mut R, schema: &Schema<T, 4>
         ) -> ([u8; 32], [u8; 64]) {
     let (private_key, public_key) = schema.generate_pair(rng);
     let private_bytes = private_key_to_bytes(&private_key);
@@ -65,8 +65,9 @@ pub fn generate_pair<T: CurveTrait, R: Rng + ?Sized>(
 }
 
 
-pub fn check_pair<T: CurveTrait>(
-            schema: &Schema<T>, private_key: &[u8; 32], public_key: &[u8; 64]
+pub fn check_pair<T: CurveTrait<4>>(
+            schema: &Schema<T, 4>,
+            private_key: &[u8; 32], public_key: &[u8; 64]
         ) -> bool {
     let private_bigi = private_key_from_bytes(private_key);
     let public_point = public_key_from_bytes(public_key);

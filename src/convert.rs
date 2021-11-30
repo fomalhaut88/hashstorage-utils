@@ -36,17 +36,17 @@ pub fn hex_from_bytes(bytes: &[u8]) -> String {
 }
 
 
-pub fn private_key_to_bytes(b: &Bigi) -> [u8; 32] {
+pub fn private_key_to_bytes(b: &Bigi<4>) -> [u8; 32] {
     b.to_bytes()[..32].try_into().unwrap()
 }
 
 
-pub fn private_key_from_bytes(bytes: &[u8; 32]) -> Bigi {
-    Bigi::from_bytes(bytes)
+pub fn private_key_from_bytes(bytes: &[u8; 32]) -> Bigi<4> {
+    Bigi::<4>::from_bytes(bytes)
 }
 
 
-pub fn public_key_to_bytes(p: &Point) -> [u8; 64] {
+pub fn public_key_to_bytes(p: &Point<4>) -> [u8; 64] {
     [
         &p.x.to_bytes()[..32],
         &p.y.to_bytes()[..32]
@@ -54,15 +54,15 @@ pub fn public_key_to_bytes(p: &Point) -> [u8; 64] {
 }
 
 
-pub fn public_key_from_bytes(bytes: &[u8; 64]) -> Point {
+pub fn public_key_from_bytes(bytes: &[u8; 64]) -> Point<4> {
     point!(
-        Bigi::from_bytes(&bytes[..32]),
-        Bigi::from_bytes(&bytes[32..])
+        Bigi::<4>::from_bytes(&bytes[..32]),
+        Bigi::<4>::from_bytes(&bytes[32..])
     )
 }
 
 
-pub fn signature_to_bytes(signature: &(Bigi, Bigi)) -> [u8; 64] {
+pub fn signature_to_bytes(signature: &(Bigi<4>, Bigi<4>)) -> [u8; 64] {
     [
         &signature.0.to_bytes()[..32],
         &signature.1.to_bytes()[..32]
@@ -70,9 +70,9 @@ pub fn signature_to_bytes(signature: &(Bigi, Bigi)) -> [u8; 64] {
 }
 
 
-pub fn signature_from_bytes(bytes: &[u8; 64]) -> (Bigi, Bigi) {
+pub fn signature_from_bytes(bytes: &[u8; 64]) -> (Bigi<4>, Bigi<4>) {
     (
-        Bigi::from_bytes(&bytes[..32]),
-        Bigi::from_bytes(&bytes[32..])
+        Bigi::<4>::from_bytes(&bytes[..32]),
+        Bigi::<4>::from_bytes(&bytes[32..])
     )
 }
