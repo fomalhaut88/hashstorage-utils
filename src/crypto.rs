@@ -1,3 +1,36 @@
+//! A standard usecase:
+//!
+//! ```rust
+//! use bigi_ecc::schemas::load_secp256k1;
+//! use hashstorage_utils::convert::{str_to_bytes_sized};
+//! use hashstorage_utils::crypto::{generate_pair, build_signature, check_signature};
+//!
+//! let mut rng = rand::thread_rng();
+//!
+//! // Load a schema
+//! let schema = load_secp256k1();
+//!
+//! // Generate a key pair
+//! let (private_key, public_key) = generate_pair(&mut rng, &schema);
+//!
+//! // Define a hashstorage block data
+//! let group: [u8; 32] = str_to_bytes_sized("my group");
+//! let key: [u8; 32] = str_to_bytes_sized("my key");
+//! let version: u64 = 1;
+//! let data = b"my test data";
+//!
+//! // Build signature
+//! let signature = build_signature(
+//!     &mut rng, &schema, &private_key, &group, &key, version, data
+//! );
+//!
+//! // Check signature
+//! let result = check_signature(
+//!     &schema, &signature, &public_key, &group, &key, version, data
+//! );
+//! assert_eq!(result, true);
+//! ```
+
 use std::convert::TryInto;
 
 use rand::Rng;
@@ -10,6 +43,8 @@ use bigi_ecc::ecdsa::{check_signature as ecdsa_check_signature,
 use crate::convert::*;
 
 
+/// Creates a signature of a hashstorage block by given: group, key, version
+/// and data.
 pub fn build_signature<T: CurveTrait<4>, R: Rng + ?Sized>(
             rng: &mut R, schema: &Schema<T, 4>,
             private_key: &[u8; 32], group: &[u8; 32], key: &[u8; 32],
@@ -24,6 +59,8 @@ pub fn build_signature<T: CurveTrait<4>, R: Rng + ?Sized>(
 }
 
 
+/// Checks the signature for a hashstorage block by given: group, key, version
+/// and data.
 pub fn check_signature<T: CurveTrait<4>>(
             schema: &Schema<T, 4>, signature: &[u8; 64],
             public_key: &[u8; 64], group: &[u8; 32], key: &[u8; 32],
@@ -38,6 +75,7 @@ pub fn check_signature<T: CurveTrait<4>>(
 }
 
 
+/// Calculates a 256-bit hash of byte array using SHA256.
 pub fn sha256_hash(bytes: &[u8]) -> [u8; 32] {
     let mut hasher = Sha256::new();
     hasher.reset();
@@ -46,6 +84,8 @@ pub fn sha256_hash(bytes: &[u8]) -> [u8; 32] {
 }
 
 
+/// Calculates SHA256 hash for hashstorage block data: group, key, version and
+/// data.
 pub fn sha256_pack(
             group: &[u8; 32], key: &[u8; 32],
             version: u64, data: &[u8]
@@ -55,6 +95,7 @@ pub fn sha256_pack(
 }
 
 
+/// Generates a random pair of private and public keys by given `schema`.
 pub fn generate_pair<T: CurveTrait<4>, R: Rng + ?Sized>(
             rng: &mut R, schema: &Schema<T, 4>
         ) -> ([u8; 32], [u8; 64]) {
@@ -65,6 +106,7 @@ pub fn generate_pair<T: CurveTrait<4>, R: Rng + ?Sized>(
 }
 
 
+/// Chechs whether the key pair is valid.
 pub fn check_pair<T: CurveTrait<4>>(
             schema: &Schema<T, 4>,
             private_key: &[u8; 32], public_key: &[u8; 64]
